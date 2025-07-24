@@ -28,7 +28,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 # Main function to start the bot
 async def main() -> None:
     # Create the Application and pass it your bot's token
-    application = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
+    application = ApplicationBuilder().token("8430701285:AAEp60qHh8XMncchveg5_0EKEABflNEO2nc").build()
 
     # Register handlers
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
