@@ -1,7 +1,7 @@
 import logging
 import requests
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
 # Set up logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -14,33 +14,28 @@ HEADERS = {
 }
 
 # Function to handle messages
-def handle_message(update: Update, context: CallbackContext) -> None:
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_message = update.message.text
     response = requests.get(API_URL, headers=HEADERS, params={"text": user_message, "thinking_enabled": "false", "search_enabled": "false"})
     
     if response.ok:
         data = response.json()
         reply_message = data.get("message", "Sorry, I didn't understand that.")
-        update.message.reply_text(reply_message)
+        await update.message.reply_text(reply_message)
     else:
-        update.message.reply_text("Error communicating with the API.")
+        await update.message.reply_text("Error communicating with the API.")
 
 # Main function to start the bot
-def main() -> None:
-    # Create the Updater and pass it your bot's token
-    updater = Updater("8430701285:AAEp60qHh8XMncchveg5_0EKEABflNEO2nc")
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+async def main() -> None:
+    # Create the Application and pass it your bot's token
+    application = ApplicationBuilder().token("YOUR_TELEGRAM_BOT_TOKEN").build()
 
     # Register handlers
-    dispatcher.add_handler(MessageHandler(filters.text & ~filters.command, handle_message))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # Start the Bot
-    updater.start_polling()
-
-    # Run the bot until you send a signal to stop
-    updater.idle()
+    await application.run_polling()
 
 if __name__ == '__main__':
-    main()
+    import asyncio
+    asyncio.run(main())
